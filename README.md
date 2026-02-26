@@ -31,9 +31,9 @@ Claude automatically loads skill metadata at startup and invokes the relevant sk
 
 ## Skills in this Collection
 
-| Skill | Description |
-|-------|-------------|
-| [skill-creator](./skill-creator/) | Create, test, benchmark, and optimize new Claude skills using an iterative eval workflow |
+| Skill | Description | Triggers when you say... |
+|-------|-------------|--------------------------|
+| [skill-creator](./skill-creator/) | Create, test, benchmark, and optimize new Claude skills using an iterative eval workflow | "create a skill for X", "make a skill that does X", "turn this workflow into a skill", "improve/update my skill", "run evals on my skill", "optimize my skill's description" |
 
 ## Installation
 
