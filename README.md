@@ -69,6 +69,9 @@ These live at the root and are auto-loaded by Claude globally:
 |-------|-------------|---------|
 | [skill-creator](./skill-creator/) | Create, test, benchmark, and optimize new Claude skills | "create a skill for X", "make a skill that does X" |
 | [omc-reference](./omc-reference/) | OMC agent catalog and tools reference | Auto-loads when orchestrating agents |
+| [explain](./explain/) | Explains any concept using Feynman first-principles style — clear, analogy-driven, no jargon | "explain X", "ELI5 X", "/explain X" |
+| [learning-goal](./learning-goal/) | Structured goal-setting using MCII — visualize outcomes, anticipate obstacles, build if-then plans | "set a learning goal", "help me plan what to learn" |
+| [learning-opportunities](./learning-opportunities/) | Offers learning exercises after architectural work to deepen understanding of design choices | Auto-triggers after features/refactors, "help me understand this" |
 
 ---
 
