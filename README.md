@@ -7,45 +7,30 @@ A personal collection of Claude Code skills and OMC (oh-my-claudecode) workflows
 This repo is the single source of truth for all Claude skills on all machines.
 
 ```
-clone → ~/.claude/skills
+git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 ```
-
-Changes made locally on any device should be committed and pushed here. Pull on other devices to sync.
 
 ---
 
 ## Folder Structure
 
 ```
-claude-skills/
-├── skills/                    # Personal & custom Claude skills
-│   ├── omc-reference/         # OMC agent catalog reference
-│   └── skill-creator/         # Create, test, and optimize new skills
+~/.claude/skills/               ← this repo (global skills directory)
+├── skill-creator/              ← loaded by Claude ✓
+├── omc-reference/              ← loaded by Claude ✓
 │
-├── omc/                       # oh-my-claudecode built-in skills
-│   ├── AGENTS.md              # OMC agent definitions
-│   ├── autopilot/             # Full autonomous execution
-│   ├── ralph/                 # Persistent loop until done
-│   ├── ultrawork/             # High-throughput parallel execution
-│   ├── ralplan/               # Consensus planning workflow
-│   ├── deep-interview/        # Socratic requirements gathering
-│   ├── team/                  # Multi-agent team orchestration
-│   ├── ultraqa/               # QA cycle: test → fix → repeat
-│   ├── ai-slop-cleaner/       # Clean AI-generated code
-│   ├── project-session-manager/ # Worktree + tmux dev environments
-│   └── ...                    # All other OMC skills
+├── omc/                        ← reference copies of OMC built-in skills
+│   ├── autopilot/              │  (loaded by OMC from its own plugin path,
+│   ├── ralph/                  │   not from here — for versioning only)
+│   └── ...
 │
+├── .gitignore
 └── README.md
 ```
 
-Each skill lives in its own folder with at minimum a `SKILL.md` file:
-
-```yaml
----
-name: skill-name
-description: When and why Claude should use this skill
----
-```
+> **How Claude discovers skills:** Claude loads any folder with a `SKILL.md` directly inside `~/.claude/skills/<name>/SKILL.md`. Skills must be at the **root level** of this directory — nested subfolders won't be auto-loaded.
+>
+> **OMC skills** (`omc/`) are loaded by oh-my-claudecode from `~/.claude/plugins/marketplaces/omc/skills/`. The copies here are for versioning and reference only.
 
 ---
 
@@ -59,35 +44,37 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 
 Then restart Claude Code — skills are loaded at startup.
 
-> **Note:** OMC skills in `omc/` are managed by oh-my-claudecode. The copies here are for versioning and reference. To install OMC itself, say `"setup omc"` inside Claude Code.
-
 ---
 
 ## Syncing Across Devices
 
 ```bash
-# Pull latest skills on a new/other device
+# Pull latest on another device
 cd ~/.claude/skills && git pull
 
 # After adding or modifying a skill locally
 cd ~/.claude/skills
-git add .
+git add <skill-folder>
 git commit -m "feat: add/update <skill-name>"
 git push
 ```
 
 ---
 
-## Skills Reference
+## Personal Skills
 
-### `skills/` — Personal Skills
+These live at the root and are auto-loaded by Claude globally:
 
 | Skill | Description | Trigger |
 |-------|-------------|---------|
-| [skill-creator](./skills/skill-creator/) | Create, test, benchmark, and optimize new Claude skills | "create a skill for X", "make a skill that does X" |
-| [omc-reference](./skills/omc-reference/) | OMC agent catalog and tools reference | Auto-loads when orchestrating agents |
+| [skill-creator](./skill-creator/) | Create, test, benchmark, and optimize new Claude skills | "create a skill for X", "make a skill that does X" |
+| [omc-reference](./omc-reference/) | OMC agent catalog and tools reference | Auto-loads when orchestrating agents |
 
-### `omc/` — OMC Built-in Skills
+---
+
+## OMC Built-in Skills (`omc/`)
+
+Reference copies of skills bundled with oh-my-claudecode. Invoke these via keyword or slash command inside Claude Code:
 
 | Skill | Description | Trigger |
 |-------|-------------|---------|
@@ -98,7 +85,7 @@ git push
 | [deep-interview](./omc/deep-interview/) | Socratic requirements gathering | say `"deep interview: ..."` |
 | [team](./omc/team/) | Coordinated multi-agent team | `/oh-my-claudecode:team` |
 | [ultraqa](./omc/ultraqa/) | QA cycle: test, verify, fix, repeat | `/oh-my-claudecode:ultraqa` |
-| [ai-slop-cleaner](./omc/ai-slop-cleaner/) | Clean up AI-generated code slop | say `"deslop"` |
+| [ai-slop-cleaner](./omc/ai-slop-cleaner/) | Clean up AI-generated code | say `"deslop"` |
 | [ccg](./omc/ccg/) | Claude + Codex + Gemini synthesis | say `"ccg"` |
 | [deep-dive](./omc/deep-dive/) | Trace investigation + requirements | `/oh-my-claudecode:deep-dive` |
 | [external-context](./omc/external-context/) | Parallel external docs/web research | `/oh-my-claudecode:external-context` |
@@ -123,7 +110,7 @@ Use the `skill-creator` skill:
 1. Open Claude Code in any project
 2. Say: *"create a skill for [your workflow]"*
 3. Claude guides you through drafting, testing, and optimizing it
-4. Drop the resulting folder into `skills/`, commit, and push
+4. Drop the resulting folder into `~/.claude/skills/` (repo root), commit, and push
 
 ---
 
