@@ -121,3 +121,4 @@ Use the `skill-creator` skill:
 
 - [oh-my-claudecode](https://github.com/sgomez/oh-my-claudecode) — OMC plugin
 - [Claude Code Docs](https://docs.anthropic.com/claude-code) — full documentation
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — Agent harness performance system: 30 agents, 135+ skills, 59 slash commands, hooks, and security rules for Claude Code
