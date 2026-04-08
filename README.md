@@ -190,14 +190,42 @@ Then **open Claude Island from /Applications** — it auto-installs the required
 
 > **tmux note**: Claude Island's messaging feature requires Claude Code to run inside tmux. Start with `tmux new-session` before launching `claude`.
 
-**Recommended `~/.zshrc` aliases** — opens Claude Island and launches Claude inside a named tmux session automatically:
+**Recommended `~/.zshrc` aliases** — opens Claude Island, launches Claude inside a named tmux session, and kills the session automatically on exit:
 
 ```zsh
-alias cc='open -a "Claude Island" 2>/dev/null; sleep 1; tmux new-session -s "claude-$(date +%s)" /bin/zsh -c "/opt/homebrew/bin/claude"'
-alias claude='open -a "Claude Island" 2>/dev/null; sleep 1; tmux new-session -s "claude-$(date +%s)" /bin/zsh -c "/opt/homebrew/bin/claude"'
+alias cc='open -a "Claude Island" 2>/dev/null; sleep 1; _sess="claude-$(date +%s)"; tmux new-session -s "$_sess" /bin/zsh -c "/opt/homebrew/bin/claude; tmux kill-session -t \"$_sess\" 2>/dev/null"'
+
+# Launch Claude Code inside tmux (required for Claude Island messaging)
+# Session is automatically killed when Claude exits (Ctrl+C or natural exit)
+alias claude='open -a "Claude Island" 2>/dev/null; sleep 1; _sess="claude-$(date +%s)"; tmux new-session -s "$_sess" /bin/zsh -c "/opt/homebrew/bin/claude; tmux kill-session -t \"$_sess\" 2>/dev/null"'
 ```
 
-Both `cc` and `claude` do the same thing: launch Claude Island, wait for it to start, then open Claude Code inside a fresh tmux session. This ensures the messaging feature works out of the box.
+Both `cc` and `claude` do the same thing: launch Claude Island, open Claude Code in a fresh tmux session, and clean up the session on exit.
+
+**Required `~/.tmux.conf`** — enables `Shift+Enter` as newline inside Claude Code (tmux blocks extended keys by default):
+
+```
+# Pass extended key sequences (Shift+Enter, etc.) through to applications
+set -g extended-keys on
+set -as terminal-features 'xterm*:extkeys'
+```
+
+And add to `~/.claude/keybindings.json`:
+
+```json
+{
+  "$schema": "https://www.schemastore.org/claude-code-keybindings.json",
+  "$docs": "https://code.claude.com/docs/en/keybindings",
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "shift+enter": "chat:newline"
+      }
+    }
+  ]
+}
+```
 
 ---
 
