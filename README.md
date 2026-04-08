@@ -36,7 +36,7 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 
 ## Full Environment Setup (run once per machine)
 
-New Claude instances should verify both components are installed:
+New Claude instances should verify all components are installed:
 
 ### 1. Skills (this repo)
 
@@ -55,20 +55,64 @@ Then restart Claude Code — skills are loaded at startup.
 
 ### 2. oh-my-claudecode (OMC) — multi-agent orchestration
 
-Run these slash commands **inside a Claude Code session**:
+Add the marketplace to `~/.claude/settings.json`:
 
-```
-/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
-/plugin install oh-my-claudecode
-/setup
+```json
+{
+  "extraKnownMarketplaces": {
+    "omc": {
+      "source": { "source": "github", "repo": "Yeachan-Heo/oh-my-claudecode" }
+    }
+  },
+  "enabledPlugins": {
+    "oh-my-claudecode@omc": true
+  }
+}
 ```
 
-Check install is healthy:
-```
-/omc-doctor
-```
+Then restart Claude Code and run `/setup` to complete initialization. Check install is healthy: `/omc-doctor`
 
 OMC provides `/autopilot`, `/ralph`, `/ultrawork`, `/team`, `/deep-interview`, and 19 specialized agents (architect, executor, planner, researcher, etc.).
+
+### 3. RTK — Rust Token Killer (~80% token savings on bash output)
+
+```bash
+brew install rtk
+rtk init -g --auto-patch   # installs hook + RTK.md globally
+rtk gain                   # verify token savings
+```
+
+### 4. everything-claude-code (ECC) — 47 agents + language rules
+
+```bash
+# Clone, copy agents and rules, then add new skills
+git clone --depth 1 https://github.com/affaan-m/everything-claude-code.git /tmp/ecc
+cp -r /tmp/ecc/agents ~/.claude/agents
+cp -r /tmp/ecc/rules ~/.claude/rules
+# Copy only skills not already present
+for d in /tmp/ecc/skills/*/; do
+  name=$(basename "$d")
+  [ ! -d ~/.claude/skills/$name ] && cp -r "$d" ~/.claude/skills/$name
+done
+rm -rf /tmp/ecc
+```
+
+Provides: 47 subagents (`~/.claude/agents/`), language rules for common/swift/typescript/python/go/etc (`~/.claude/rules/`), and additional skills.
+
+### 5. Claude Island — Dynamic Island notifications for macOS
+
+macOS menu bar app that shows Claude Code activity, permission prompts, and chat history over the MacBook notch.
+
+```bash
+# Download and install
+curl -L https://github.com/farouqaldori/claude-island/releases/download/v1.2/ClaudeIsland-1.2.dmg -o /tmp/ClaudeIsland.dmg
+hdiutil attach /tmp/ClaudeIsland.dmg
+cp -r "/Volumes/Claude Island/Claude Island.app" /Applications/
+hdiutil detach "/Volumes/Claude Island"
+rm /tmp/ClaudeIsland.dmg
+```
+
+Then **open Claude Island from /Applications** — it auto-installs the required hooks into `~/.claude/hooks/` on first launch. Requires macOS 15.6+.
 
 ---
 
@@ -253,6 +297,7 @@ Use the `skill-creator` skill:
 ## Resources
 
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) — OMC plugin (multi-agent orchestration)
-- [Claude Code Docs](https://docs.anthropic.com/claude-code) — full documentation
-- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — Agent harness performance system: 30 agents, 135+ skills, 59 slash commands, hooks, and security rules for Claude Code
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — 47 agents, 181 skills, language rules, hooks for Claude Code
 - [rtk](https://github.com/rtk-ai/rtk) — Rust Token Killer: compresses Bash output before it reaches Claude, saving ~80% tokens per session (`rtk gain` to see savings)
+- [claude-island](https://github.com/farouqaldori/claude-island) — macOS Dynamic Island notifications for Claude Code (permission prompts, session activity, chat history)
+- [Claude Code Docs](https://docs.anthropic.com/claude-code) — full documentation
