@@ -34,7 +34,18 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 
 ---
 
-## Full Environment Setup (run once per machine)
+## Quick Start (new machine)
+
+```bash
+# One-command bootstrap — installs everything below automatically
+bash <(curl -fsSL https://raw.githubusercontent.com/bingcheng45/claude-skills/main/bootstrap.sh)
+```
+
+After bootstrap: **restart Claude Code**, run `/setup`, then `/oh-my-claudecode:omc-doctor`.
+
+---
+
+## Full Environment Setup (manual steps)
 
 New Claude instances should verify all components are installed:
 
@@ -55,7 +66,7 @@ Then restart Claude Code — skills are loaded at startup.
 
 ### 2. oh-my-claudecode (OMC) — multi-agent orchestration
 
-Add the marketplace to `~/.claude/settings.json`:
+**Step A**: Add the marketplace to `~/.claude/settings.json`:
 
 ```json
 {
@@ -70,7 +81,34 @@ Add the marketplace to `~/.claude/settings.json`:
 }
 ```
 
-Then restart Claude Code and run `/setup` to complete initialization. Check install is healthy: `/omc-doctor`
+**Step B**: Restart Claude Code and run `/setup` to download and build the plugin.
+
+**Step C**: Install the OMC CLI (required for HUD session stats):
+
+```bash
+npm install -g oh-my-claude-sisyphus@latest
+omc update   # sync any version drift
+```
+
+**Step D**: Add the OMC config block to `~/.claude/CLAUDE.md`. Either run `/oh-my-claudecode:omc-setup` inside Claude Code, or append `config/CLAUDE-omc-block.md` from this repo manually.
+
+**Step E**: Install the HUD statusline script:
+
+```bash
+mkdir -p ~/.claude/hud
+cp ~/.claude/skills/config/omc-hud.mjs ~/.claude/hud/omc-hud.mjs
+```
+
+Then add to `~/.claude/settings.json`:
+
+```json
+"statusLine": {
+  "type": "command",
+  "command": "node ${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hud/omc-hud.mjs"
+}
+```
+
+Check install is healthy: `/oh-my-claudecode:omc-doctor`
 
 OMC provides `/autopilot`, `/ralph`, `/ultrawork`, `/team`, `/deep-interview`, and 19 specialized agents (architect, executor, planner, researcher, etc.).
 
@@ -79,16 +117,6 @@ OMC provides `/autopilot`, `/ralph`, `/ultrawork`, `/team`, `/deep-interview`, a
 ```bash
 brew install rtk
 rtk init -g --auto-patch   # installs hook + RTK.md globally
-rtk gain                   # verify token savings
-
-### 2b. OMC CLI (required for HUD + session usage)
-
-```bash
-npm install -g oh-my-claude-sisyphus@latest
-omc update   # sync version drift
-```
-
-Then add the OMC config block to `~/.claude/CLAUDE.md` by running `/oh-my-claudecode:omc-setup` in a Claude Code session.
 rtk gain                   # verify token savings
 ```
 
@@ -123,6 +151,81 @@ rm /tmp/ClaudeIsland.dmg
 ```
 
 Then **open Claude Island from /Applications** — it auto-installs the required hooks into `~/.claude/hooks/` on first launch. Requires macOS 15.6+.
+
+> **tmux note**: Claude Island's messaging feature requires Claude Code to run inside tmux. Start with `tmux new-session` before launching `claude`.
+
+---
+
+## Configuration Reference (`config/`)
+
+Reference files for the full working configuration live in `config/`:
+
+| File | Purpose |
+|------|---------|
+| `config/settings.json` | Complete `~/.claude/settings.json` template with correct permissions |
+| `config/CLAUDE-omc-block.md` | OMC block to append to `~/.claude/CLAUDE.md` |
+| `config/omc-hud.mjs` | HUD statusline script for `~/.claude/hud/omc-hud.mjs` |
+
+---
+
+## Gotchas & Fixes
+
+These are real issues encountered during setup — read before troubleshooting:
+
+### `[API err]` in OMC HUD statusline
+
+Two separate root causes, both needed:
+
+1. **OMC CLI not installed** → `npm install -g oh-my-claude-sisyphus@latest`
+2. **`<!-- OMC:START -->` block missing from `~/.claude/CLAUDE.md`** → run `/oh-my-claudecode:omc-setup` or append `config/CLAUDE-omc-block.md`
+
+### HUD shows "NOT configured" or no session stats
+
+The OMC plugin was downloaded but not built. Fix:
+
+```bash
+# Find the plugin cache dir
+PLUGIN_DIR=$(ls -d ~/.claude/plugins/cache/omc/oh-my-claudecode/*/  | tail -1)
+cd "$PLUGIN_DIR" && npm install && npm run build
+```
+
+### `Permission denied` — Claude can't write outside project directory
+
+Two bugs in `settings.json` cause this:
+
+1. **Wrong `defaultMode`**: `"dontAsk"` silently denies without prompting. Use `"bypassPermissions"` instead.
+2. **Invalid wildcard syntax**: `"Bash(*)"` is not valid. Use bare tool names: `"Bash"`, `"Write"`, etc.
+3. **Missing `additionalDirectories`**: Claude can't write to `~/.claude/` unless listed here.
+
+Correct permissions block:
+
+```json
+"permissions": {
+  "defaultMode": "bypassPermissions",
+  "allow": ["Bash", "Read", "Write", "Edit", "Glob", "Grep",
+            "WebFetch", "WebSearch", "NotebookRead", "NotebookEdit",
+            "TodoRead", "TodoWrite"],
+  "additionalDirectories": ["/Users/your-username/.claude"]
+}
+```
+
+See `config/settings.json` for the complete working template.
+
+### OMC version drift warning at session start
+
+```bash
+omc update   # syncs CLAUDE.md OMC block to match installed plugin version
+```
+
+### Claude Island — "open in tmux to enable messaging"
+
+Claude Island's messaging (send messages to Claude from Dynamic Island) requires a tmux session. Launch Claude Code this way:
+
+```bash
+tmux new-session -s claude
+# then inside tmux:
+claude
+```
 
 ---
 
