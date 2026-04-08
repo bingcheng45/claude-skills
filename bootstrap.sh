@@ -30,16 +30,13 @@ success "Skills repo ready"
 info "Step 2/6: RTK (Rust Token Killer)"
 if command -v rtk &>/dev/null; then
   success "RTK already installed ($(rtk --version 2>/dev/null || echo 'version unknown'))"
+  rtk init -g --auto-patch 2>/dev/null || warn "  rtk init already applied or failed — check manually"
+elif command -v brew &>/dev/null; then
+  brew install rtk && rtk init -g --auto-patch 2>/dev/null
+  success "RTK installed via brew"
 else
-  if command -v brew &>/dev/null; then
-    brew install rtk
-    success "RTK installed via brew"
-  else
-    die "Homebrew not found. Install RTK manually: https://github.com/rtk-ai/rtk"
-  fi
+  warn "Homebrew not found — skipping RTK. Install manually: https://github.com/rtk-ai/rtk"
 fi
-# Init RTK global hook (idempotent)
-rtk init -g --auto-patch 2>/dev/null || warn "  rtk init already applied or failed — check manually"
 
 # ── 3. OMC CLI ────────────────────────────────────────────────────────────────
 info "Step 3/6: OMC CLI (oh-my-claude-sisyphus)"
