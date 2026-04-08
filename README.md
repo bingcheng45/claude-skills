@@ -80,6 +80,16 @@ OMC provides `/autopilot`, `/ralph`, `/ultrawork`, `/team`, `/deep-interview`, a
 brew install rtk
 rtk init -g --auto-patch   # installs hook + RTK.md globally
 rtk gain                   # verify token savings
+
+### 2b. OMC CLI (required for HUD + session usage)
+
+```bash
+npm install -g oh-my-claude-sisyphus@latest
+omc update   # sync version drift
+```
+
+Then add the OMC config block to `~/.claude/CLAUDE.md` by running `/oh-my-claudecode:omc-setup` in a Claude Code session.
+rtk gain                   # verify token savings
 ```
 
 ### 4. everything-claude-code (ECC) — 47 agents + language rules
