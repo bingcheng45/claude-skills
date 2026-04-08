@@ -39,6 +39,11 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 ```bash
 # One-command bootstrap — installs everything below automatically
 bash <(curl -fsSL https://raw.githubusercontent.com/bingcheng45/claude-skills/main/bootstrap.sh)
+
+# Already installed? Run this to upgrade everything to latest
+bash <(curl -fsSL https://raw.githubusercontent.com/bingcheng45/claude-skills/main/bootstrap.sh) --update
+# or if the repo is already cloned:
+bash ~/.claude/skills/bootstrap.sh --update
 ```
 
 After bootstrap: **restart Claude Code**, run `/setup`, then `/oh-my-claudecode:omc-doctor`.
