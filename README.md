@@ -142,7 +142,38 @@ rm -rf /tmp/ecc
 
 Provides: 47 subagents (`~/.claude/agents/`), language rules for common/swift/typescript/python/go/etc (`~/.claude/rules/`), and additional skills.
 
-### 5. Claude Island — Dynamic Island notifications for macOS
+### 5. App Store Connect CLI — automate iOS/macOS release workflows
+
+Command-line tool for App Store Connect — upload builds, manage TestFlight, certificates, metadata, and Xcode Cloud from terminal or CI.
+
+**Prerequisites**: App Store Connect API key (key ID, issuer ID, `.p8` file) from https://appstoreconnect.apple.com/access/integrations/api
+
+```bash
+# Install
+brew install asc
+
+# Authenticate (standard — uses macOS Keychain)
+asc auth login \
+  --name "MyApp" \
+  --key-id "ABC123" \
+  --issuer-id "DEF456" \
+  --private-key /path/to/AuthKey.p8 \
+  --network
+
+# Headless / CI (no Keychain)
+asc auth login \
+  --bypass-keychain \
+  --name "MyCIKey" \
+  --key-id "ABC123" \
+  --issuer-id "DEF456" \
+  --private-key /path/to/AuthKey.p8
+
+# Verify
+asc auth doctor
+asc apps list --output table
+```
+
+### 6. Claude Island — Dynamic Island notifications for macOS
 
 macOS menu bar app that shows Claude Code activity, permission prompts, and chat history over the MacBook notch.
 
@@ -158,6 +189,15 @@ rm /tmp/ClaudeIsland.dmg
 Then **open Claude Island from /Applications** — it auto-installs the required hooks into `~/.claude/hooks/` on first launch. Requires macOS 15.6+.
 
 > **tmux note**: Claude Island's messaging feature requires Claude Code to run inside tmux. Start with `tmux new-session` before launching `claude`.
+
+**Recommended `~/.zshrc` aliases** — opens Claude Island and launches Claude inside a named tmux session automatically:
+
+```zsh
+alias cc='open -a "Claude Island" 2>/dev/null; sleep 1; tmux new-session -s "claude-$(date +%s)" /bin/zsh -c "/opt/homebrew/bin/claude"'
+alias claude='open -a "Claude Island" 2>/dev/null; sleep 1; tmux new-session -s "claude-$(date +%s)" /bin/zsh -c "/opt/homebrew/bin/claude"'
+```
+
+Both `cc` and `claude` do the same thing: launch Claude Island, wait for it to start, then open Claude Code inside a fresh tmux session. This ensures the messaging feature works out of the box.
 
 ---
 
@@ -414,6 +454,7 @@ Use the `skill-creator` skill:
 
 ## Resources
 
+- [App Store Connect CLI](https://github.com/rudrankriyam/App-Store-Connect-CLI) — `asc`: scriptable CLI for App Store Connect — TestFlight, metadata, certificates, Xcode Cloud
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) — OMC plugin (multi-agent orchestration)
 - [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — 47 agents, 181 skills, language rules, hooks for Claude Code
 - [rtk](https://github.com/rtk-ai/rtk) — Rust Token Killer: compresses Bash output before it reaches Claude, saving ~80% tokens per session (`rtk gain` to see savings)

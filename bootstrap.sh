@@ -148,6 +148,25 @@ else
   success "ECC installed/updated (agents, rules, skills)"
 fi
 
+# ── App Store Connect CLI — macOS only ───────────────────────────────────────
+if [[ "$(uname)" == "Darwin" ]]; then
+  info "Bonus: App Store Connect CLI (asc)"
+  if command -v asc &>/dev/null && ! $UPDATE_MODE; then
+    success "asc already installed ($(asc version 2>/dev/null || echo 'version unknown')) — skipping (use --update to upgrade)"
+  elif command -v brew &>/dev/null; then
+    if $UPDATE_MODE && command -v asc &>/dev/null; then
+      info "  Upgrading asc..."
+      brew upgrade asc 2>/dev/null || info "  asc already at latest"
+    else
+      info "  Installing asc via Homebrew..."
+      brew install asc
+    fi
+    success "App Store Connect CLI installed — run 'asc auth login' to configure"
+  else
+    warn "Homebrew not found — skipping asc. Install manually: https://github.com/rudrankriyam/App-Store-Connect-CLI"
+  fi
+fi
+
 # ── Claude Island — macOS only ───────────────────────────────────────────────
 if [[ "$(uname)" == "Darwin" ]]; then
   info "Bonus: Claude Island (Dynamic Island notifications)"
