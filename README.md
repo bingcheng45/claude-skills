@@ -34,15 +34,41 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 
 ---
 
-## Installation
+## Full Environment Setup (run once per machine)
 
-Clone directly into your Claude skills directory:
+New Claude instances should verify both components are installed:
+
+### 1. Skills (this repo)
 
 ```bash
+# Check
+ls ~/.claude/skills | wc -l   # should show 100+
+
+# Install
 git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
+
+# Upgrade
+cd ~/.claude/skills && git pull
 ```
 
 Then restart Claude Code — skills are loaded at startup.
+
+### 2. oh-my-claudecode (OMC) — multi-agent orchestration
+
+Run these slash commands **inside a Claude Code session**:
+
+```
+/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
+/plugin install oh-my-claudecode
+/setup
+```
+
+Check install is healthy:
+```
+/omc-doctor
+```
+
+OMC provides `/autopilot`, `/ralph`, `/ultrawork`, `/team`, `/deep-interview`, and 19 specialized agents (architect, executor, planner, researcher, etc.).
 
 ---
 
@@ -226,7 +252,7 @@ Use the `skill-creator` skill:
 
 ## Resources
 
-- [oh-my-claudecode](https://github.com/sgomez/oh-my-claudecode) — OMC plugin
+- [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) — OMC plugin (multi-agent orchestration)
 - [Claude Code Docs](https://docs.anthropic.com/claude-code) — full documentation
 - [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — Agent harness performance system: 30 agents, 135+ skills, 59 slash commands, hooks, and security rules for Claude Code
 - [rtk](https://github.com/rtk-ai/rtk) — Rust Token Killer: compresses Bash output before it reaches Claude, saving ~80% tokens per session (`rtk gain` to see savings)
