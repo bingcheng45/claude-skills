@@ -42,7 +42,7 @@ fi
 echo ""
 
 # ── 1. Skills repo ────────────────────────────────────────────────────────────
-info "Step 1/6: Skills repo"
+info "Step 1/2: Skills repo"
 if [ -d "$CLAUDE_DIR/skills/.git" ]; then
   info "  Pulling latest..."
   git -C "$CLAUDE_DIR/skills" pull --ff-only || warn "  Pull failed; continuing with existing version"
@@ -53,7 +53,7 @@ fi
 success "Skills repo ready"
 
 # ── 2. RTK ────────────────────────────────────────────────────────────────────
-info "Step 2/6: RTK (Rust Token Killer)"
+info "Step 2/2: RTK (Rust Token Killer)"
 if command -v rtk &>/dev/null; then
   if $UPDATE_MODE && command -v brew &>/dev/null; then
     info "  Upgrading RTK..."
@@ -67,66 +67,6 @@ elif command -v brew &>/dev/null; then
   success "RTK installed via brew"
 else
   warn "Homebrew not found — skipping RTK. Install manually: https://github.com/rtk-ai/rtk"
-fi
-
-# ── 3. OMC CLI ────────────────────────────────────────────────────────────────
-info "Step 3/6: OMC CLI (oh-my-claude-sisyphus)"
-if command -v omc &>/dev/null && ! $UPDATE_MODE; then
-  success "OMC CLI already installed"
-else
-  info "  Installing/upgrading to latest..."
-  npm install -g oh-my-claude-sisyphus@latest
-  success "OMC CLI installed/upgraded"
-  omc update 2>/dev/null || true
-fi
-
-# ── 4. HUD script ─────────────────────────────────────────────────────────────
-info "Step 4/6: OMC HUD script"
-mkdir -p "$CLAUDE_DIR/hud"
-if [ -f "$CLAUDE_DIR/hud/omc-hud.mjs" ] && ! $UPDATE_MODE; then
-  success "HUD script already present"
-else
-  cp "$CLAUDE_DIR/skills/config/omc-hud.mjs" "$CLAUDE_DIR/hud/omc-hud.mjs"
-  success "HUD script installed/updated"
-fi
-
-# ── 5. settings.json ─────────────────────────────────────────────────────────
-info "Step 5/6: settings.json"
-SETTINGS="$CLAUDE_DIR/settings.json"
-if [ -f "$SETTINGS" ] && ! $UPDATE_MODE; then
-  warn "  Already exists — skipping (run with --update to overwrite, or merge manually)"
-  warn "  Key things to verify:"
-  warn "    • defaultMode: 'bypassPermissions'  (NOT 'dontAsk')"
-  warn "    • allow entries have NO parentheses: 'Bash' not 'Bash(*)'"
-  warn "    • additionalDirectories includes '$CLAUDE_DIR'"
-  warn "    • statusLine.command points to omc-hud.mjs"
-elif [ -f "$SETTINGS" ] && $UPDATE_MODE; then
-  warn "  --update: skipping settings.json (manual merge required to avoid overwriting customisations)"
-  warn "  Reference config: $CLAUDE_DIR/skills/config/settings.json"
-else
-  sed "s|/Users/bingcheng/.claude|$CLAUDE_DIR|g" \
-    "$CLAUDE_DIR/skills/config/settings.json" > "$SETTINGS"
-  success "settings.json installed"
-fi
-
-# ── 6. CLAUDE.md OMC block ───────────────────────────────────────────────────
-info "Step 6/6: CLAUDE.md OMC block"
-CLAUDE_MD="$CLAUDE_DIR/CLAUDE.md"
-if grep -q "OMC:START" "$CLAUDE_MD" 2>/dev/null; then
-  if $UPDATE_MODE; then
-    info "  Updating OMC block to latest..."
-    # Remove old block and re-append
-    sed -i '' '/<!-- OMC:START -->/,/<!-- OMC:END -->/d' "$CLAUDE_MD"
-    echo "" >> "$CLAUDE_MD"
-    cat "$CLAUDE_DIR/skills/config/CLAUDE-omc-block.md" >> "$CLAUDE_MD"
-    success "CLAUDE.md OMC block updated"
-  else
-    success "CLAUDE.md already has OMC block"
-  fi
-else
-  echo "" >> "$CLAUDE_MD"
-  cat "$CLAUDE_DIR/skills/config/CLAUDE-omc-block.md" >> "$CLAUDE_MD"
-  success "OMC block appended to CLAUDE.md"
 fi
 
 # ── ECC (everything-claude-code) — optional ──────────────────────────────────
@@ -195,10 +135,8 @@ fi
 echo "╟──────────────────────────────────────────────────────────────╢"
 echo "║  Next steps:                                                 ║"
 echo "║  1. Restart Claude Code                                      ║"
-echo "║  2. Run /setup  (installs/updates OMC plugin)                ║"
-echo "║  3. Run /oh-my-claudecode:omc-doctor  (verify health)        ║"
-echo "║  4. Run: omc update  (sync OMC version drift)                ║"
+echo "║  2. Verify skills loaded: ls ~/.claude/skills                 ║"
 if [[ "$(uname)" == "Darwin" ]]; then
-echo "║  5. Open Claude Island from /Applications (macOS)            ║"
+echo "║  3. Open Claude Island from /Applications (macOS)            ║"
 fi
 echo "╚══════════════════════════════════════════════════════════════╝"
