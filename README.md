@@ -17,7 +17,7 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 ```
 ~/.claude/skills/               ← this repo (global skills directory)
 ├── skill-creator/              ← loaded by Claude ✓
-├── swiftui-patterns/           ← loaded by Claude ✓
+├── prepare-ios-review/          ← loaded by Claude ✓
 ├── prepare-ios-review/         ← loaded by Claude ✓
 │
 ├── pstack/                     ← bundled plugin (44 nested skills)
@@ -246,11 +246,6 @@ These live at the root and are auto-loaded by Claude globally:
 | [prepare-ios-review](./prepare-ios-review/) | Take an iOS app from merged code to a submission-ready App Store Connect version using the asc CLI — preflight the version… | "cut a release", "submit to App Store", "asc" |
 | [resolve-pr-comments-and-review](./resolve-pr-comments-and-review/) | Work through pull request review comments end to end — fetch every thread, verify each claim against current HEAD before… | "address the review", "PR comments", "CI is red" |
 | [symphony-planner](./symphony-planner/) | Decompose a feature request into parallel-safe Linear tickets ready for Symphony/Codex to execute. Use when a feature is too… | "break this into tickets", "plan for Symphony" |
-| [swiftui-patterns](./swiftui-patterns/) | SwiftUI architecture patterns, state management with @Observable, view composition, navigation, performance optimization,… | "SwiftUI architecture", "@Observable" |
-| [swift-concurrency-6-2](./swift-concurrency-6-2/) | Swift 6.2 Approachable Concurrency — single-threaded by default, @concurrent for explicit background offloading, isolated… | "Swift 6 concurrency", "@concurrent" |
-| [swift-actor-persistence](./swift-actor-persistence/) | Thread-safe data persistence in Swift using actors — in-memory cache with file-backed storage, eliminating data races by… | "actor persistence", "thread-safe cache" |
-| [swift-protocol-di-testing](./swift-protocol-di-testing/) | Protocol-based dependency injection for testable Swift code — mock file system, network, and external APIs using focused… | "protocol DI", "mock the file system" |
-| [foundation-models-on-device](./foundation-models-on-device/) | Apple FoundationModels framework for on-device LLM — text generation, guided generation with @Generable, tool calling, and… | "on-device LLM", "@Generable" |
 | [remotion-video-creation](./remotion-video-creation/) | Best practices for Remotion - Video creation in React. 29 domain-specific rules covering 3D, animations, audio, captions,… | "make a video in React", "Remotion" |
 
 ---
