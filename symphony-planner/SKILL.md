@@ -112,6 +112,33 @@ Description file format:
 
 ## Depends on
 <list of prerequisite ticket IDs, or "none">
+
+## Agent Updates
+Post a comment starting with `@linear` to update this ticket's properties.
+Examples:
+- Mark in progress: `@linear set state: In Progress`
+- Mark done: `@linear set state: Done`
+- Flag a blocker: `@linear add label: blocked` + explain in the same comment
+
+When a PR is opened, post a comment with the GitHub link:
+```
+PR: <github_pr_url>
+Branch: <branch_name>
+```
+
+When work is complete, post a completion summary comment:
+```
+## Work Summary
+<2–4 sentences describing what was changed and why>
+
+## Files Changed
+<bullet list of files modified>
+
+## Validation Result
+<output of the validation command or screenshot description>
+
+PR: <github_pr_url>
+```
 ```
 
 ### 8 · Delegate property updates via @linear agent
@@ -136,18 +163,35 @@ After tickets are created, any ticket property changes (state, priority, labels,
 - A ticket is blocked by an unexpected dependency — add a `blocked` label and comment explaining why
 - Priority changes based on new information
 - A ticket needs to be split: close the original with `@linear set state: Cancelled` and reference the new ticket IDs in the comment
+- A PR is opened — post the GitHub PR URL as a comment immediately
+- Work is complete — post a completion summary comment before marking Done
 
-**Embedding delegation hints in ticket descriptions:**
+**Required agent comments (mandatory, not optional):**
 
-When writing the description for each ticket, include a `## Agent Updates` section so Symphony agents know how to self-report progress:
-
+1. **On PR creation** — post immediately after `gh pr create`:
 ```
-## Agent Updates
-Post a comment starting with `@linear` to update this ticket's properties.
-Examples:
-- Mark in progress: `@linear set state: In Progress`
-- Mark done: `@linear set state: Done`
-- Flag a blocker: `@linear add label: blocked` + explain in the same comment
+PR: <github_pr_url>
+Branch: <branch_name>
+```
+
+2. **On completion** — post before `@linear set state: Done`:
+```
+## Work Summary
+<2–4 sentences describing what was changed and why>
+
+## Files Changed
+<bullet list of files modified>
+
+## Validation Result
+<output of the validation command or screenshot description>
+
+PR: <github_pr_url>
+```
+
+3. **On blocker** — post with label update:
+```
+@linear add label: blocked
+Blocker: <reason — e.g. "gh auth not configured, GITHUB_TOKEN not set">
 ```
 
 ## Built-in rules (always apply)
@@ -159,6 +203,9 @@ Examples:
 - Never omit a `## Depends on` section even if the value is "none"
 - Never create a ticket with no concrete validation step
 - Never use `linear issue edit` for updates — always delegate to `@linear` via ticket comment
+- Always post PR link as a ticket comment immediately after `gh pr create`
+- Always post a completion summary comment before marking a ticket Done
+- Always post a blocker comment (with reason) before adding the `blocked` label
 
 ## Example — "Add CSV export"
 
