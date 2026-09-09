@@ -10,7 +10,6 @@ set -euo pipefail
 
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 SKILLS_REPO="https://github.com/bingcheng45/claude-skills.git"
-ECC_REPO="https://github.com/affaan-m/everything-claude-code.git"
 UPDATE_MODE=false
 
 # Parse flags
@@ -67,25 +66,6 @@ elif command -v brew &>/dev/null; then
   success "RTK installed via brew"
 else
   warn "Homebrew not found — skipping RTK. Install manually: https://github.com/rtk-ai/rtk"
-fi
-
-# ── ECC (everything-claude-code) — optional ──────────────────────────────────
-info "Bonus: everything-claude-code (ECC)"
-if [ -d "$CLAUDE_DIR/agents" ] && ! $UPDATE_MODE; then
-  success "ECC agents already installed — skipping (use --update to refresh)"
-else
-  info "  Cloning ECC..."
-  rm -rf /tmp/ecc-bootstrap
-  git clone --depth 1 "$ECC_REPO" /tmp/ecc-bootstrap
-  cp -rf /tmp/ecc-bootstrap/agents "$CLAUDE_DIR/agents"
-  cp -rf /tmp/ecc-bootstrap/rules  "$CLAUDE_DIR/rules"
-  # Copy only skills not already present (never overwrite custom skills)
-  for d in /tmp/ecc-bootstrap/skills/*/; do
-    name=$(basename "$d")
-    [ ! -d "$CLAUDE_DIR/skills/$name" ] && cp -r "$d" "$CLAUDE_DIR/skills/$name"
-  done
-  rm -rf /tmp/ecc-bootstrap
-  success "ECC installed/updated (agents, rules, skills)"
 fi
 
 # ── App Store Connect CLI — macOS only ───────────────────────────────────────

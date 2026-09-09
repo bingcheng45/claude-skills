@@ -76,22 +76,21 @@ rtk init -g --auto-patch   # installs hook + RTK.md globally
 rtk gain                   # verify token savings
 ```
 
-### 3. everything-claude-code (ECC) — 47 agents + language rules
+### 3. everything-claude-code (ECC) — 47 agents + language rules (optional)
+
+Manual step — `bootstrap.sh` does **not** install ECC.
 
 ```bash
-# Clone, copy agents and rules, then add new skills
+# Agents and rules only — do NOT copy ECC's skills
 git clone --depth 1 https://github.com/affaan-m/everything-claude-code.git /tmp/ecc
 cp -r /tmp/ecc/agents ~/.claude/agents
 cp -r /tmp/ecc/rules ~/.claude/rules
-# Copy only skills not already present
-for d in /tmp/ecc/skills/*/; do
-  name=$(basename "$d")
-  [ ! -d ~/.claude/skills/$name ] && cp -r "$d" ~/.claude/skills/$name
-done
 rm -rf /tmp/ecc
 ```
 
-Provides: 47 subagents (`~/.claude/agents/`), language rules for common/swift/typescript/python/go/etc (`~/.claude/rules/`), and additional skills.
+Provides: 47 subagents (`~/.claude/agents/`) and language rules for common/swift/typescript/python/go/etc (`~/.claude/rules/`).
+
+> **Do not copy `/tmp/ecc/skills/` into `~/.claude/skills/`.** ECC ships ~181 skills; that bulk copy is how this repo accumulated the 179 skills removed in `865219a`. Add ECC skills one at a time, deliberately.
 
 ### 4. App Store Connect CLI — automate iOS/macOS release workflows
 
