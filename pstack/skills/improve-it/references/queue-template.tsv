@@ -1,0 +1,4 @@
+id	wave	title	scope (files/area)	depends_on	operator_gate
+A	1	Fix analytics attribution after the deferred tag loader	analytics lib, tag loader in the root layout	-	owner registers the renamed custom dimension
+B	1	Public table writes only through the API	db client, write route, migrations	-	owner sets the server key, then runs the migration
+C	2	Security headers in report-only mode	framework config headers	B merged	-
