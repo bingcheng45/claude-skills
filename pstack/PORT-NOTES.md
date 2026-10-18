@@ -59,6 +59,14 @@ or by running `/setup-pstack`.
 `skills/poteto-mode/scripts/` (TypeScript + bun) is upstream's own tooling and runs the same here.
 `CURSOR_AUTOMATION_ID` parsing in `watch-pr` reads Bugbot comment metadata from GitHub, so it stays.
 
+### Local additions
+
+Not from upstream. A three-way merge leaves these alone. A fresh copy of upstream would delete them.
+
+| Skill | What it does |
+|---|---|
+| `skills/improve-it/` | Reviews a site the user owns in four read-only lanes (performance, SEO, audience, reliability), re-checks every claim, publishes one ranked review page, and on the user's go runs the fixes through Autopilot-full. User-invoked. |
+
 ## Pulling upstream changes
 
 The upstream checkout is at `~/.claude/pstack-src` (sparse, `pstack/` only).

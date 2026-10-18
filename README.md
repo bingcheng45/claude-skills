@@ -20,7 +20,7 @@ git clone https://github.com/bingcheng45/claude-skills.git ~/.claude/skills
 ├── prepare-ios-review/          ← loaded by Claude ✓
 ├── prepare-ios-review/         ← loaded by Claude ✓
 │
-├── pstack/                     ← bundled plugin (44 nested skills)
+├── pstack/                     ← bundled plugin (45 nested skills)
 │   └── skills/                 │  loaded via the pstack plugin,
 │       ├── how/                │  not from this directory directly
 │       └── ...
@@ -252,11 +252,13 @@ These live at the root and are auto-loaded by Claude globally:
 
 ## Bundled Plugin: `pstack/`
 
-A Claude Code port of [pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT, upstream 0.14.5). Its 44 skills live under `pstack/skills/` and are loaded by the plugin, not from this directory's root.
+A Claude Code port of [pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT, upstream 0.14.5). Its 45 skills live under `pstack/skills/` and are loaded by the plugin, not from this directory's root.
 
-Workflow skills: `architect`, `arena`, `automate-me`, `blast-radius`, `bro`, `create-verification-skill`, `figure-it-out`, `how`, `interrogate`, `maintain-verification-skill`, `no-comments`, `poteto-mode`, `recall`, `reflect`, `setup-pstack`, `show-me-your-work`, `swarm`, `tdd`, `teach`, `technical-writing`, `typescript-best-practices`, `unslop`, `why`
+Workflow skills: `architect`, `arena`, `automate-me`, `blast-radius`, `bro`, `create-verification-skill`, `figure-it-out`, `how`, `improve-it`, `interrogate`, `maintain-verification-skill`, `no-comments`, `poteto-mode`, `recall`, `reflect`, `setup-pstack`, `show-me-your-work`, `swarm`, `tdd`, `teach`, `technical-writing`, `typescript-best-practices`, `unslop`, `why`
 
 Plus 21 `principle-*` skills encoding engineering principles (fix-root-causes, prove-it-works, type-system-discipline, …).
+
+`improve-it` is a local addition, not from upstream. See `pstack/PORT-NOTES.md`.
 
 ---
 
