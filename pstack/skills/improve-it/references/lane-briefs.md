@@ -9,7 +9,7 @@ Read-only <LANE> review of <SITE_URL> (<FRAMEWORK> on <HOST>, functions in <REGI
 
 Do NOT edit the repo, commit, deploy, change any host, database, analytics or Search Console setting, write to any database (the reliability lane's zero-row probes are the only exception), submit any form, or run `vercel curl` (it silently creates a deployment-protection bypass secret). Read env var names only and never print secret values. Write scratch files only under <SCRATCH>/audit/<LANE>/.
 
-Drive the live site with Playwright, not the signed-in browser, and before the first navigation block every write and every analytics beacon with page.route: fulfill requests to <WRITE_ENDPOINTS> with a stub response and abort requests to <BEACON_HOSTS>. Lab runs and walkthroughs must not write data or pollute the analytics being measured. Use the signed-in browser only for dashboards (Search Console); load its tools in one ToolSearch batch, create your OWN new tab, and close it when done.
+Drive the live site with Playwright, not the signed-in browser, and before the first navigation block every write and every analytics beacon with page.route. Fulfill every non-GET request to <SITE_URL>'s origin (Server Actions post to the page URL) and to <WRITE_ENDPOINTS> with a stub response, and abort requests to <BEACON_URLS>. page.route cannot stop writes the server makes while rendering a page, so skip any page whose render writes (check the code) and say so. Lab runs and walkthroughs must not write data or pollute the analytics being measured. Use the signed-in browser only for dashboards (Search Console); load its tools in one ToolSearch batch, create your OWN new tab, and close it when done.
 
 Read first, so you report NEW findings and progress, not repeats:
 <PRIOR_WORK: plan docs, roadmaps, earlier review artifacts (read with the Artifact tool, action "read"), measurement docs>
@@ -69,7 +69,7 @@ Also return 3 to 5 content ideas (pages, features or articles), each tied to the
 Known open items to re-verify, not repeat: <KNOWN_ITEMS>.
 1. Database permissions with the public (anon) key from <ENV_FILE> (read it into a variable, never echo it). The only writes allowed are zero-row probes:
    - SELECT with a small limit: which tables and columns are readable, any personal data.
-   - UPDATE and DELETE with a filter that matches no row (for example `id=eq.-1`) and `Prefer: return=minimal`. A 204 proves only that the role holds the table grant, not that row-level security lets it change a row. A 401 or 403 means no grant.
+   - UPDATE and DELETE with a filter that matches no row and fits the column type (`id=eq.-1` for an integer key, `id=eq.00000000-0000-0000-0000-000000000000` for a uuid) and `Prefer: return=minimal`. First check <SCHEMA_PATHS> for statement-level triggers on the table; they fire even when no row matches, so skip that table. A 204 proves only that the role holds the table grant, not that row-level security lets it change a row. A 401 or 403 means no grant.
    - INSERT: never probe live. Decide from the policies and grants in <SCHEMA_PATHS> and the migrations.
    Confirm write exposure against the row-level security policies before grading any write finding above medium.
 2. Input integrity: can a client post an impossible value or spam a public list; current public rows that look fake (read-only GET); server-side checks to add.

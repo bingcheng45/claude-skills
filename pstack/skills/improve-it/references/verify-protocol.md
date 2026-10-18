@@ -8,7 +8,7 @@ You verify one PR at its exact merge-ready head SHA. You do not fix anything, pu
 - Make your own worktree at the head SHA: `git -C <REPO> fetch origin && git -C <REPO> worktree add --detach $ROOT/verify/<pr>-<lane> <sha>`. Run `<INSTALL>` there (never symlink dependency folders). Copy `<REPO>/<ENV_FILE>` in for runs, and never print it.
 - Use only the two ports in your brief. Stop servers and remove both worktrees (`git worktree remove --force`) when done.
 - Never deploy, never change <SERVICES>, never write to production data, never run `vercel curl`.
-- Live runs: when `<NON_PROD_DB>` exists, point runs at it. In every browser run, before the first navigation, use Playwright `page.route` to fulfill requests to `<WRITE_ENDPOINTS>` with a stub response and abort requests to `<BEACON_HOSTS>` (GA collect and vendor beacons). Check server write paths through the PR's mocked-client tests, never live. If proving the behaviour needs a real write, stop and report `VERDICT BLOCKED`.
+- Live runs: when `<NON_PROD_DB>` exists, point runs at it. In every browser run, before the first navigation, use Playwright `page.route` to fulfill every non-GET request to `<SITE_URL>`'s origin (Server Actions post to the page URL) and to `<WRITE_ENDPOINTS>` with a stub response, and abort requests to `<BEACON_URLS>`. `page.route` cannot stop writes the server makes while rendering a page, so run such pages only against `<NON_PROD_DB>` or skip them and say so. Check server write paths through the PR's mocked-client tests, never live. If proving the behaviour needs a real write, stop and report `VERDICT BLOCKED`.
 - <FLAKY_TESTS>
 
 ## Lanes
