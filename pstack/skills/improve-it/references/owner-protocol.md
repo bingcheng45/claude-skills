@@ -13,7 +13,7 @@ You own one PR from build to merge. The root coordinator owns verification and g
 
 ## Hard limits
 
-- Never deploy, and never run `vercel deploy`, `vercel curl` or anything that changes <SERVICES, e.g. "Vercel, Supabase, Google Analytics or Search Console"> settings or data.
+- Never deploy, and never run `vercel deploy`, `vercel curl` or anything that changes <SERVICES, e.g. "Vercel, Supabase, Google Analytics or Search Console"> settings or data. Pushing a branch may create a preview deployment on the host, which is allowed. Production deploys happen only through merges after the root's signal.
 - Never write to the production database. Never submit to live public forms or lists (<LIVE_SURFACES>).
 - Never force-push anything but your own branch, and only with `git push --force-with-lease` after `git ls-remote`.
 - Never merge until the root sends you a message that says "clean verdict, merge". For a PR with a `before-merge` operator gate, the root sends it only after the user confirms the step.
@@ -32,7 +32,7 @@ You own one PR from build to merge. The root coordinator owns verification and g
    - <GATES, e.g. "npm run build", "npx tsc --noEmit", "npm run lint">
    - `<TEST_CMD>` for the folders you touched, and one full run. <FLAKY_TESTS, e.g. "Tests in X time out under load on trunk too. Re-run them alone and compare with trunk before blaming your change.">
    The head is now code-ready: diff final, gates green, rebased onto current trunk.
-9. Push. If the repo has CI, run the babysit watcher `<WATCH_PR> <n>` until it reports checks green. Fix any red check and return to step 8.
+9. Push. If the repo has CI, run the babysit watcher `<WATCH_PR> --pr <n>` until it reports checks green. Fix any red check and return to step 8.
 10. Self-proof on the real app under the live-run rules below: run `<SERVE_CMD> -p <your port>` and prove the behaviour your PR changes with screenshots or a script. <VERIFY_SKILL, e.g. "The repo skill .claude/skills/verify-<app>/SKILL.md shows how to drive it."> Save evidence under `$ROOT/owners/$OWNER/proof/`.
 11. The head is now merge-ready: code-ready, CI green, self-proof done, trunk-current. After `git fetch origin`, if `git merge-base --is-ancestor origin/<TRUNK> HEAD` fails, return to step 7. End your turn with the report below. The root verifies that exact SHA.
 
@@ -50,8 +50,8 @@ The root may message you findings. Fix every finding, add a red test where the d
 
 ## Merge, only on "clean verdict, merge"
 
-1. `git fetch origin`, rebase onto `origin/<TRUNK>`, re-run the gates, and push with `--force-with-lease`. Run `<WATCH_PR> <n>` until checks are green on the pushed head. If the repo has no CI, re-run <GATES> on the pushed head instead.
-2. Check that `git merge-tree --write-tree origin/<TRUNK> HEAD` is clean, and that no file in `git diff --name-only $(git merge-base HEAD origin/<TRUNK>) origin/<TRUNK>` is a file your PR changes. If either fails, rebase again and report the new head instead of merging.
+1. `git fetch origin`, rebase onto `origin/<TRUNK>`, re-run the gates, and push with `--force-with-lease`. Run `<WATCH_PR> --pr <n>` until checks are green on the pushed head. If the repo has no CI, re-run <GATES> on the pushed head instead.
+2. Run `git fetch origin` again, then check that `git merge-tree --write-tree origin/<TRUNK> HEAD` is clean, and that no file in `git diff --name-only $(git merge-base HEAD origin/<TRUNK>) origin/<TRUNK>` is a file your PR changes. If either fails, rebase again and report the new head instead of merging.
 3. If the patch changed during the rebase (`git patch-id` differs from the verified head), report the new head and wait. Otherwise `gh pr merge <n> --squash`.
 4. Report the merge commit SHA. Remove your worktree with `git worktree remove` once merged.
 
