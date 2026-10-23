@@ -9,7 +9,7 @@ export GIT_TERMINAL_PROMPT=0
 ROOT="${WORKTREE_REAPER_ROOT:-$HOME/ai_projects}"
 LOG="${WORKTREE_REAPER_LOG:-$HOME/Library/Logs/worktree-reaper.log}"
 IDLE_DAYS="${WORKTREE_IDLE_DAYS:-7}"
-MERGED_IDLE_DAYS="${WORKTREE_MERGED_IDLE_DAYS:-1}"
+MERGED_IDLE_DAYS="${WORKTREE_MERGED_IDLE_DAYS:-3}"
 APP_MANAGED_RE='^[a-z]+-[a-z]+-[0-9a-f]{6}$'
 LOCK_GRACE_SECS=60
 MODE=dry-run
@@ -26,7 +26,7 @@ Environment:
   WORKTREE_REAPER_ROOT        repo root to scan (default: \$HOME/ai_projects)
   WORKTREE_REAPER_LOG         TSV log (default: ~/Library/Logs/worktree-reaper.log)
   WORKTREE_IDLE_DAYS          idle days before an unreviewed worktree goes (default 7)
-  WORKTREE_MERGED_IDLE_DAYS   idle days before a merged/closed-PR worktree goes (default 1)
+  WORKTREE_MERGED_IDLE_DAYS   idle days before a merged/closed-PR worktree goes (default 3)
 EOF
 }
 
