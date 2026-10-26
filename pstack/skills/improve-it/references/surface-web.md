@@ -46,7 +46,7 @@ Return at most ~10 findings, highest impact first. Each finding:
 - suggested change, concrete (proposed title text, header value, query, file)
 - effort S/M/L, and risk
 - already planned? (name the doc or PR and its status)
-Then an "already fine" list, one line each, and the paths of screenshots or traces you saved. Keep the report under <WORD_LIMIT, about 1,200> words.
+Then an "already fine" list, one line each, and the paths of screenshots or traces you saved. Keep the report under <WORD_LIMIT, about 1,200> words. Return it as your final message, not as a file; the coordinator saves it.
 ```
 
 ## performance

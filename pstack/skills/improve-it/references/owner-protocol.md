@@ -16,7 +16,7 @@ You own one PR from build to merge. The root coordinator owns verification and g
 - <RELEASE_LIMITS> Never change <SERVICES, e.g. "App Store Connect, TestFlight or Polar", or "Vercel, Supabase, Google Analytics or Search Console"> settings or data. Anything a merge ships happens only through merges after the root's signal.
 - Never write to the production database. Never submit to live public forms or lists (<LIVE_SURFACES>).
 - Never force-push anything but your own branch, and only with `git push --force-with-lease` after `git ls-remote`.
-- Never merge until the root sends you a message that says "clean verdict, merge". For a PR with a `before-merge` operator gate, the root sends it only after the user confirms the step.
+- Never merge until the root sends you a message that says "clean verdict, merge". Merges land the way the user chose: <MERGE_MODE, "the user clicks merge; stop at merge-ready and report the PR" or "run gh pr merge">. For a PR with a `before-merge` operator gate, the root sends it only after the user confirms the step.
 - Touch only the files your brief scopes. If you must touch a file outside it, say so in your report.
 
 ## Lifecycle
@@ -49,7 +49,7 @@ The root may message you findings. Fix every finding, add a red test where the d
 
 1. `git fetch origin`, rebase onto `origin/<TRUNK>`, re-run the gates, and push with `--force-with-lease`. Run `<WATCH_PR> --pr <n>` until checks are green on the pushed head. If the repo has no CI, re-run <GATES> on the pushed head instead.
 2. Run `git fetch origin` again, then check that `git merge-tree --write-tree origin/<TRUNK> HEAD` is clean, and that no file in `git diff --name-only $(git merge-base HEAD origin/<TRUNK>) origin/<TRUNK>` is a file your PR changes. If either fails, rebase again and report the new head instead of merging.
-3. If the patch changed during the rebase (`git patch-id` differs from the verified head), report the new head and wait. Otherwise `gh pr merge <n> --squash`.
+3. If the patch changed during the rebase (`git patch-id` differs from the verified head), report the new head and wait. Otherwise `gh pr merge <n> --squash`. If a permission check denies the merge, do not retry or work around it. Report `STATE merge-ready` with "merge blocked by permissions".
 4. Report the merge commit SHA. Remove your worktree with `git worktree remove` once merged.
 
 ## Report format (your final message each turn)
