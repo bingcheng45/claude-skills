@@ -1,6 +1,29 @@
-# Review lane briefs
+# Surface: web
 
-Each lane brief is the shared preamble followed by that lane's section. Fill every `<PLACEHOLDER>` from Phase 0.
+A website or web app on a host. Lanes: performance, seo, audience, reliability.
+
+## Frame fields
+
+- Site. `SITE_URL`, `HOST_NAME`, `FRAMEWORK`, `HOST`, `REGION`, `DATABASE`.
+- Data stores. `NON_PROD_DB` (a non-production database or branch, if any), `ENV_FILE`, `SCHEMA_PATHS` (policies, grants, migrations), `WRITE_ENDPOINTS` (write URLs on other hosts the browser calls, such as the database's REST API), `BEACON_URLS` (every GA collect host, every vendor beacon, and same-origin analytics paths such as `/_vercel/insights/*`, `/_vercel/speed-insights/*` or a first-party tag proxy).
+- Analytics. `HOST_FIELD_DATA`, `GA4_ID`, `EVENT_LIST` with each custom dimension's registration date (ask the user when no doc records it), `FUNNEL_EVENTS`, `GSC_PROPERTY` and its `RESOURCE_ID`, `LOG_SOURCE`, and how each is read (MCP connector, or the signed-in browser when no connector exists). On a site that is not a game, the funnel steps are its conversion events: CTA click, sign-up, lead form.
+- Pages. `KEY_PAGES` (home, the main action page, any repeat surface, one content page, one non-default locale page), `MAIN_ACTION_PAGE`, `MONEY_PAGES`, `SECONDARY_SURFACES`, `WALKTHROUGH_PATH`.
+
+## Phase 4 values
+
+- `PROOF_RUN`: `<SERVE_CMD> -p <your port>`, then drive it in Playwright under the live-run rules. `SERVE_CMD` must accept a trailing `-p <port>` (`npx next start`, or `npm run start --`).
+- `RUN_SLOTS`: owner ports in steps of 10 from 3100; each verifier lane gets two ports from a separate base (its run and the trunk baseline).
+- `RELEASE_LIMITS`: never deploy, and never run `vercel deploy`, `vercel curl` (it silently creates a deployment-protection bypass secret) or anything that changes `SERVICES` settings or data. A push may create a preview deployment, which is allowed. A merge to trunk deploys to production.
+- `SAFETY_FOCUS`: database permissions and migrations, secrets reaching client bundles, caching that could serve one user another user's data or stale personal rows, headers that could break third-party scripts, analytics payload changes, SEO regressions (canonical, hreflang, noindex, sitemap), and production-deploy risk.
+
+## Live-run rules
+
+Lanes, owners and verifiers all follow these.
+
+- Drive the site with Playwright, not the signed-in browser. Before the first navigation, `page.route` fulfills every non-GET request to `SITE_URL`'s origin (Server Actions post to the page URL) and to `WRITE_ENDPOINTS` with a stub response, and aborts `BEACON_URLS`. No write leaves the browser, and no run lands in the site's analytics.
+- `page.route` cannot stop writes the server makes while rendering a page. Run such pages only against `NON_PROD_DB`, or skip them and say so.
+- Local servers use `ENV_FILE`, which points at production services. When `NON_PROD_DB` exists, point runs at it. Prove server write paths in tests with mocked clients, never against the live database.
+- Use the signed-in browser only for dashboards (Search Console). Load its tools in one ToolSearch batch, create your own new tab, and close it when done.
 
 ## Shared preamble
 
@@ -9,7 +32,7 @@ Read-only <LANE> review of <SITE_URL> (<FRAMEWORK> on <HOST>, functions in <REGI
 
 Do NOT edit the repo, commit, deploy, change any host, database, analytics or Search Console setting, write to any database (the reliability lane's zero-row probes are the only exception), submit any form, or run `vercel curl` (it silently creates a deployment-protection bypass secret). Read env var names only and never print secret values. Write scratch files only under <SCRATCH>/audit/<LANE>/.
 
-Drive the live site with Playwright, not the signed-in browser, and before the first navigation block every write and every analytics beacon with page.route. Fulfill every non-GET request to <SITE_URL>'s origin (Server Actions post to the page URL) and to <WRITE_ENDPOINTS> with a stub response, and abort requests to <BEACON_URLS>. page.route cannot stop writes the server makes while rendering a page, so skip any page whose render writes (check the code) and say so. Lab runs and walkthroughs must not write data or pollute the analytics being measured. Use the signed-in browser only for dashboards (Search Console); load its tools in one ToolSearch batch, create your OWN new tab, and close it when done.
+<LIVE_RUN_RULES, pasted from this file> Lab runs and walkthroughs must not write data or pollute the analytics being measured.
 
 Read first, so you report NEW findings and progress, not repeats:
 <PRIOR_WORK: plan docs, roadmaps, earlier review artifacts (read with the Artifact tool, action "read"), measurement docs>
@@ -23,7 +46,7 @@ Return at most ~10 findings, highest impact first. Each finding:
 - suggested change, concrete (proposed title text, header value, query, file)
 - effort S/M/L, and risk
 - already planned? (name the doc or PR and its status)
-Then an "already fine" list, one line each, and the paths of screenshots or traces you saved. Keep the report under <WORD_LIMIT, about 1,200> words.
+Then an "already fine" list, one line each, and the paths of screenshots or traces you saved. Keep the report under <WORD_LIMIT, about 1,200> words. Return it as your final message, not as a file; the coordinator saves it.
 ```
 
 ## performance
