@@ -1,6 +1,6 @@
 ---
 name: improve-it
-description: "Review a product the user owns (an iOS app, a macOS app, or a website or web app) with four parallel read-only lanes picked for that surface, re-check every headline claim, publish one ranked review page, and on the user's go run the fixes as an autopilot PR program. Use for /improve-it, 'review my app', 'review my Mac app', 'review my site', 'what should I improve next', or a product-wide health check that should end in a prioritized list."
+description: "Review a product the user owns (an iOS app, a macOS app, or a website or web app) with four parallel read-only lanes picked for that surface, re-check every headline claim, publish one ranked review page, and on the user's go run the fixes as an autopilot PR program, then /reflect on the run to fix the skill and the product's memory. Use for /improve-it, 'review my app', 'review my Mac app', 'review my site', 'what should I improve next', or a product-wide health check that should end in a prioritized list."
 disable-model-invocation: true
 ---
 
@@ -29,6 +29,7 @@ Open a todolist with one entry per phase before launching anything.
 2. Re-check and rank
 3. Publish the review page
 4. Fix program (only on the user's go)
+5. Reflect (after Phase 3, and again after Phase 4)
 
 ## Phase 0: Frame
 
@@ -77,7 +78,7 @@ You own every claim on the page. A lane's report is a lead, not a fact.
 
 Run Artifact quickstart, then write and publish one page per `references/review-page.md`. Before writing, read `~/.claude/design/*.md` when present (at least `00` to `03`, `05`, `07`, `08`, `09`, and `artifacts.md`).
 
-Then reply in chat with the link and the "do first" list in plain words. Change nothing in the product. Offer Phase 4 in one line.
+Then reply in chat with the link and the "do first" list in plain words. Change nothing in the product. Offer Phase 4 in one line. Then run Phase 5 over the review.
 
 ## Phase 4: Fix program (only on the user's go)
 
@@ -100,8 +101,18 @@ States. **code-ready** means the diff is final, the gates are green on the commi
 5. **Verify before every merge.** At each merge-ready head SHA, fan out the verifier lanes from the verify protocol per the **swarm** skill, as local background agents. Send every proven finding back to the owner in one message. Only a clean verdict on that head earns "clean verdict, merge".
 6. **Hand off owner steps.** End with the merged PRs, the open ones, and the operator gates still waiting on the user, in the order they must happen (for example "set the key, then run the migration").
 
+## Phase 5: Reflect
+
+Turn what went wrong in this run into fixes, so the next run doesn't repeat it. Run it once the review page is out (covering Phases 0 to 3), and again after the Phase 4 hand-off (covering Phase 4 only). Skip a pass only when nothing went wrong in it, and say so.
+
+Read the **reflect** skill (`../reflect/SKILL.md`) in full and run it as written, with these changes:
+
+- Transcripts. Give each reviewer the session transcript and every agent transcript this run spawned: lanes, owners and verifiers, in the `subagents/` folder beside the session transcript. Most run problems show only there: blocked commands, tool and MCP errors, permission denials, wrong devices.
+- Routing. A problem any product would hit goes to this skill: SKILL.md, the surface file, or a protocol. A problem specific to this product (a flaky test, a missing key, a device or tool quirk, a data source that is down) goes to the product's memory under `~/.claude/projects/<project>/memory/`, which Phase 0 reads next time.
+- Approval. Show the Accepted, Rejected and Backlog lists and wait, as reflect requires. When the user also has a Phase 4 decision pending, ask both in one message. Edit skill files in the repo the installed skill comes from, on a branch with a PR, not only in the installed copy.
+
 ## Rules
 
 - A finding without a suggested change is a note, not a finding.
 - Never print secrets. Read env and `.xcconfig` key names, keep values in variables.
-- Reply per poteto-mode's **Writing the reply**: the link, the do-first list, what you re-checked, what you dropped as stale and why.
+- Reply per poteto-mode's **Writing the reply**: the link, the do-first list, what you re-checked, what you dropped as stale and why, and the reflect lists when Phase 5 has run.
