@@ -65,7 +65,7 @@ Not from upstream. A three-way merge leaves these alone. A fresh copy of upstrea
 
 | Skill | What it does |
 |---|---|
-| `skills/improve-it/` | Reviews a site the user owns in four read-only lanes (performance, SEO, audience, reliability), re-checks every claim, publishes one ranked review page, and on the user's go runs the fixes through Autopilot-full. User-invoked. |
+| `skills/improve-it/` | Reviews an iOS app, macOS app or site the user owns in four read-only lanes picked per surface (apps: performance, store, audience, reliability; web: performance, SEO, audience, reliability), re-checks every claim, publishes one ranked review page, and on the user's go runs the fixes through Autopilot-full. User-invoked. |
 
 ## Pulling upstream changes
 

@@ -1,6 +1,6 @@
 ---
 name: improve-it
-description: "Review a website, web app, iOS app or macOS app the user owns with four parallel read-only lanes (web: performance, SEO, audience, reliability; apps: performance, store, audience, reliability), re-check every headline claim, publish one ranked review page, and on the user's go run the fixes as an autopilot PR program. Use for /improve-it, 'review my site', 'review my app', 'what should I improve next', or a product-wide health check that should end in a prioritized list."
+description: "Review a product the user owns (an iOS app, a macOS app, or a website or web app) with four parallel read-only lanes picked for that surface, re-check every headline claim, publish one ranked review page, and on the user's go run the fixes as an autopilot PR program. Use for /improve-it, 'review my app', 'review my Mac app', 'review my site', 'what should I improve next', or a product-wide health check that should end in a prioritized list."
 disable-model-invocation: true
 ---
 
@@ -14,10 +14,11 @@ Each surface file owns its frame fields, Phase 4 values, live-run rules and four
 
 | Surface | Pick when | File | Lanes |
 |---|---|---|---|
+| ios | an iPhone or iPad app (`.xcodeproj` or `.xcworkspace` whose app target has `SDKROOT = iphoneos`, or `Package.swift` with `.iOS` platforms and an app target) | `references/surface-ios.md` | performance, store, audience, reliability |
+| macos | a Mac app (an app target with `SDKROOT = macosx`, or `Package.swift` with `.macOS` platforms and an executable or app target) | `references/surface-macos.md` | performance, store, audience, reliability |
 | web | a deployed site or web app (`package.json` with a web framework, a host config, a `SITE_URL`) | `references/surface-web.md` | performance, seo, audience, reliability |
-| apple-app | an iOS or macOS app (`.xcodeproj`, `.xcworkspace`, or `Package.swift` with an executable or app target) | `references/surface-apple-app.md` | performance, store, audience, reliability |
 
-An app repo with a server folder (a Worker, an API) is apple-app with that server as its `BACKEND`. A repo with two products, such as an app plus its marketing site, gets the surface the user names. When they name neither, ask which one. Run the other as a second review afterwards if they want it.
+An app repo with a server folder (a Worker, an API) gets the app's surface, with that server as its `BACKEND`. A multiplatform app with both iOS and macOS targets is two products for this purpose. A repo with two products, such as an app plus its marketing site, gets the surface the user names. When they name neither, ask which one. Run the other as a second review afterwards if they want it.
 
 ## Start
 
@@ -44,14 +45,18 @@ Spawn four lanes in one message as local background agents, `subagent_type: gene
 
 | Surface | Lane | Covers |
 |---|---|---|
+| ios | performance | field metrics (Organizer, MetricKit), launch and main-action timing on a simulator, main-thread work, background modes and extensions, repeated work, download size |
+| ios | store | App Store Connect conversion and search, listing text and screenshots per device, ratings and reviews, pricing and paywall clarity, review-guideline risks |
+| ios | audience | funnel from the analytics SDK or store data, then day-1 and day-7 return, a first-use walkthrough on a small and large phone in both themes at the largest text size, ideas tied to a signal |
+| ios | reliability | crashes and hangs, user data, App Group and migrations, destructive actions on the wrong item, concurrency and backgrounding, purchases and restore, release settings, backend probes |
+| macos | performance | field metrics when they exist, launch and main-action timing, main-thread work, idle cost of a menu bar or background app, repeated work, binary size |
+| macos | store | Mac App Store listing, or the download page, Gatekeeper and notarization path and update feed; pricing, trial and license clarity; review and notarization risks |
+| macos | audience | funnel from the analytics SDK, store, update feed or license sales, then day-1 and day-7 return, a headless first-use walkthrough at small and large window sizes in both themes with each permission request, keyboard paths, ideas tied to a signal |
+| macos | reliability | crashes and hangs, user data and migrations, destructive actions on the wrong file or process, concurrency, sleep and wake, purchases and licensing, Sparkle, signing and notarization, backend probes |
 | web | performance | host field data, lab timing in headless Chrome, cache headers, dynamic vs static routes, bundle, third-party scripts |
 | web | seo | Search Console, GA4 organic, a crawl of sitemap, robots, canonicals, hreflang and structured data, low-CTR and position 8-20 queries |
 | web | audience | GA4 funnel (one row per `FUNNEL_EVENTS` step, then return), converting landing pages and sources, a first-visit walkthrough at desktop and 375 px with screenshots, content ideas tied to a data signal |
 | web | reliability | zero-row database permission probes, input integrity, error logs and their retention, security headers, client data loss, `npm audit` |
-| apple-app | performance | field metrics (Organizer, MetricKit), launch and main-action timing, main-thread work, idle cost of a resident app, repeated work, size |
-| apple-app | store | App Store Connect conversion and search, listing text and screenshots, ratings and reviews, or the download page and update feed; pricing and paywall clarity; review-guideline risks |
-| apple-app | audience | funnel from the analytics SDK or store data, then day-1 and day-7 return, a first-use walkthrough through the screen lever at small and large sizes in both themes, ideas tied to a signal |
-| apple-app | reliability | crashes and hangs, user data and migrations, destructive actions on the wrong item, concurrency, purchases and licensing, update and signing path, backend probes |
 
 Every lane is read-only except the reliability lane's zero-row probes and throwaway fixtures under its scratch dir. The coordinator writes only scratch files and the review page until Phase 4.
 
@@ -66,7 +71,7 @@ You own every claim on the page. A lane's report is a lead, not a fact.
 3. Merge duplicates across lanes. One finding seen by two lanes is one item with both lanes' evidence.
 4. Downgrade one-day signals to "watch" unless a second source agrees. Say so on the page.
 5. Rank by user impact over effort. Anything that can lose user data, act destructively on the wrong thing, or allow production writes ranks first. Then crashes and broken measurement (it distorts every other number), then what blocks the main action or the purchase, then discovery (search, store) and speed.
-6. Split out owner steps: anything only the owner can do (dashboard settings, keys, migrations against production, Search Console buttons, registering analytics dimensions, App Store Connect metadata, StoreKit products, signing and release).
+6. Split out owner steps: anything only the owner can do (dashboard settings, keys, migrations against production, Search Console buttons, registering analytics dimensions, App Store Connect metadata, StoreKit products, license-service products, the update feed, signing, notarization and release).
 
 ## Phase 3: Publish the review page
 

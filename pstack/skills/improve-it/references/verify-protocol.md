@@ -15,7 +15,7 @@ You verify one PR at its exact merge-ready head SHA. You do not fix anything, pu
 ## Lanes
 
 - **gates-live**: at the SHA run <GATES> and `<TEST_CMD>` for the touched folders. Then <PROOF_RUN> and prove the PR's load-bearing behaviour on the real app (<VERIFY_SKILL>). Run the same scenario on current `origin/<TRUNK>` as the regression baseline, in a second worktree on your second run slot. If trunk lacks the feature, say so and gate the new behaviour and the end state instead. Screenshots or script output go in `$ROOT/verdicts/<pr>/<lane>/`.
-- **audit-correctness**: read the full diff (`git diff origin/<TRUNK>...<sha>`) and the code around it. Look for behaviour bugs, broken callers, missing cases, tests that would pass even if the code returned undefined, hydration or SSR mismatches (web), main-actor and concurrency mistakes (apps), localization gaps across all locales, and anything that changes what users see beyond the brief.
+- **audit-correctness**: read the full diff (`git diff origin/<TRUNK>...<sha>`) and the code around it. Look for behaviour bugs, broken callers, missing cases, tests that would pass even if the code returned undefined, main-actor and concurrency mistakes (apps), hydration or SSR mismatches (web), localization gaps across all locales, and anything that changes what users see beyond the brief.
 - **audit-safety**: read the full diff with a focus on data, config and security: <SAFETY_FOCUS>.
 
 ## Report (your final message)
