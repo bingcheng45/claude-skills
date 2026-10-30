@@ -33,7 +33,7 @@ You own one PR from build to merge. The root coordinator owns verification and g
    - `<TEST_CMD>` for the folders you touched, and one full run. <FLAKY_TESTS, e.g. "Tests in X time out under load on trunk too. Re-run them alone and compare with trunk before blaming your change.">
    The head is now code-ready: diff final, gates green, rebased onto current trunk.
 9. Push. If the repo has CI, run the babysit watcher `<WATCH_PR> --pr <n>` until it reports checks green. Fix any red check and return to step 8.
-10. Self-proof on the real app under the live-run rules below: <PROOF_RUN>. Prove the behaviour your PR changes with screenshots or a script. <VERIFY_SKILL, e.g. "The repo skill .claude/skills/verify-<app>/SKILL.md shows how to drive it."> Save evidence under `$ROOT/owners/$OWNER/proof/`.
+10. Self-proof on the real app under the live-run rules below: <PROOF_RUN>. Prove the behaviour your PR changes with screenshots or a script, captured twice: once on trunk (`before-*`) and once on your head (`after-*`), at the same size, state and inputs, so the PR review page can show them side by side. For a change users don't see, save the before and after output of what does change (headers, status codes, request counts, rendered HTML). <VERIFY_SKILL, e.g. "The repo skill .claude/skills/verify-<app>/SKILL.md shows how to drive it."> Save evidence under `$ROOT/owners/$OWNER/proof/`.
 11. The head is now merge-ready: code-ready, CI green, self-proof done, trunk-current. After `git fetch origin`, if `git merge-base --is-ancestor origin/<TRUNK> HEAD` fails, return to step 7. End your turn with the report below. The root verifies that exact SHA.
 
 ## Live runs
