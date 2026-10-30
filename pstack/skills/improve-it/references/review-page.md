@@ -4,7 +4,7 @@ One artifact page. This file sets only its content and order. The design files s
 
 ## Shape
 
-A reading page, single column about 760 px. Title is the product's name plus "review" (two to four words in `<title>`, e.g. "Acme site review", "Clearing app review"). When an earlier review page exists, publish a new one and link the earlier one under the meta line. Under the `h1`, one `meta` line naming every source and its date range ("code at 0b64122, App Store Connect 28 days to 18 Oct, launch timings 18 Oct", or "GA4 to 17 Oct, Search Console 28 days to 18 Oct, lab runs 18 Oct").
+A reading page, single column about 760 px. Title is the product's name plus "review" (two to four words in `<title>`, e.g. "Acme site review", "Clearing app review"). When an earlier review page exists, publish a new one and link the earlier one under the meta line. Under the `h1`, one `meta` line naming every source and its date range ("code at 0b64122, App Store Connect 28 days to 18 Oct, launch timings 18 Oct", or "GA4 to 17 Oct, Search Console 28 days to 18 Oct, lab runs 18 Oct"). List each lab run's window against production (start and end time, user agent) under the meta line.
 
 Write headings as claims, not topics. "Most visitors never reach the first action" beats "Funnel". "Clicks are up 25%. The next gains are a few page titles" beats "SEO".
 
@@ -26,5 +26,6 @@ Impact (high, medium, low), effort (S, M, L), and "planned" when a doc already c
 
 - Every number on the page appears in a lane report or your own re-check. Search the page for each one.
 - Stale items from Phase 2 are gone, not struck through.
+- A claim built on fewer than about 20 events shows its raw counts. A before/after comparison uses the same filter on both sides.
 - Check the page at about 400 px wide: no horizontal scroll, screenshots scale down.
 - `description` on publish is one sentence: what was reviewed and that nothing in the product changed.

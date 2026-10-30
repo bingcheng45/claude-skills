@@ -5,7 +5,7 @@ A website or web app on a host. Lanes: performance, seo, audience, reliability.
 ## Frame fields
 
 - Site. `SITE_URL`, `HOST_NAME`, `FRAMEWORK`, `HOST`, `REGION`, `DATABASE`.
-- Data stores. `NON_PROD_DB` (a non-production database or branch, if any), `ENV_FILE`, `SCHEMA_PATHS` (policies, grants, migrations), `WRITE_ENDPOINTS` (write URLs on other hosts the browser calls, such as the database's REST API), `BEACON_URLS` (every GA collect host, every vendor beacon, and same-origin analytics paths such as `/_vercel/insights/*`, `/_vercel/speed-insights/*` or a first-party tag proxy).
+- Data stores. `NON_PROD_DB` (a non-production database or branch, if any), `ENV_FILE`, `SCHEMA_PATHS` (policies, grants, migrations), `WRITE_ENDPOINTS` (write URLs on other hosts the browser calls, such as the database's REST API), `BEACON_URLS` (same-origin analytics paths such as `/_vercel/insights/*`, `/_vercel/speed-insights/*` or a first-party tag proxy), `ALLOWED_HOSTS` (the other hosts a page needs to render, such as a font or image CDN).
 - Analytics. `HOST_FIELD_DATA`, `GA4_ID`, `EVENT_LIST` with each custom dimension's registration date (ask the user when no doc records it), `FUNNEL_EVENTS`, `GSC_PROPERTY` and its `RESOURCE_ID`, `LOG_SOURCE`, and how each is read (MCP connector, or the signed-in browser when no connector exists). On a site that is not a game, the funnel steps are its conversion events: CTA click, sign-up, lead form.
 - Pages. `KEY_PAGES` (home, the main action page, any repeat surface, one content page, one non-default locale page), `MAIN_ACTION_PAGE`, `MONEY_PAGES`, `SECONDARY_SURFACES`, `WALKTHROUGH_PATH`.
 
@@ -20,7 +20,7 @@ A website or web app on a host. Lanes: performance, seo, audience, reliability.
 
 Lanes, owners and verifiers all follow these.
 
-- Drive the site with Playwright, not the signed-in browser. Before the first navigation, `page.route` fulfills every non-GET request to `SITE_URL`'s origin (Server Actions post to the page URL) and to `WRITE_ENDPOINTS` with a stub response, and aborts `BEACON_URLS`. No write leaves the browser, and no run lands in the site's analytics.
+- Drive the site with Playwright from `$SCRATCH/audit/pw`, not the signed-in browser, and follow `VERIFY_SKILL`. Before the first navigation, `page.route` fulfills every non-GET request to `SITE_URL`'s origin (Server Actions post to the page URL) and to `WRITE_ENDPOINTS` with a stub response, aborts `BEACON_URLS`, and aborts every request whose host is neither `SITE_URL`'s nor in `ALLOWED_HOSTS`. Log each aborted host. Never use a blocklist of analytics hosts instead, since GA also collects through hosts such as `analytics.google.com` and regional `google.<tld>`. No write leaves the browser, and no run lands in the site's analytics.
 - `page.route` cannot stop writes the server makes while rendering a page. Run such pages only against `NON_PROD_DB`, or skip them and say so.
 - Local servers use `ENV_FILE`, which points at production services. When `NON_PROD_DB` exists, point runs at it. Prove server write paths in tests with mocked clients, never against the live database.
 - Use the signed-in browser only for dashboards (Search Console). Load its tools in one ToolSearch batch, create your own new tab, and close it when done.
@@ -46,15 +46,15 @@ Return at most ~10 findings, highest impact first. Each finding:
 - suggested change, concrete (proposed title text, header value, query, file)
 - effort S/M/L, and risk
 - already planned? (name the doc or PR and its status)
-Then an "already fine" list, one line each, and the paths of screenshots or traces you saved. Keep the report under <WORD_LIMIT, about 1,200> words. Return it as your final message, not as a file; the coordinator saves it.
+Then an "already fine" list, one line each, the paths of screenshots or traces you saved, and the start and end time and user agent of each run against production. Keep the report under <WORD_LIMIT, about 1,200> words. Return it as your final message, not as a file; the coordinator saves it.
 ```
 
 ## performance
 
 ```
 Find the biggest remaining wins for real visitors. Measure, don't guess.
-1. Field data first: <HOST_FIELD_DATA, e.g. Vercel Speed Insights via the host MCP> for LCP, INP, CLS, TTFB per route and device, p75, last 28 days. Search Console's Core Web Vitals report if the SEO lane isn't covering it.
-2. Lab timing on <KEY_PAGES>, including one non-default locale page: TTFB, LCP, CLS, gzipped JS transferred, request count, render-blocking resources, fonts. Use headless Chrome (playwright-core with `chromium.launch({ channel: "chrome" })`, writes and beacons routed as above). At least 3 runs per page, report medians, mobile throttling for LCP at least.
+1. Field data first: LCP, INP, CLS, TTFB per route and device, p75, last 28 days. Use the sources in this order and give each one's last-updated date: <HOST_FIELD_DATA, e.g. Vercel Speed Insights via the host MCP>, Search Console's Core Web Vitals report, the CrUX or PageSpeed Insights API (its quota may be spent).
+2. Lab timing on <KEY_PAGES>, including one non-default locale page: TTFB, LCP, CLS, gzipped JS transferred, request count, render-blocking resources, fonts. Use headless Chrome (playwright-core with `chromium.launch({ channel: "chrome" })`, writes and beacons routed as above). At least 3 runs per page, report medians, mobile throttling for LCP at least. Run `uptime` before each batch and write the 1-minute load beside each median.
 3. Dynamic vs static: which routes render on demand and which are static or ISR, from build output or `x-vercel-cache` / `cache-control` / `age` headers on production. Name routes that cost far-from-region visitors a round trip and could be static or edge-cached. For each read-only API, say whether a short `s-maxage` plus `stale-while-revalidate` is safe (no per-user data).
 4. Bundle: largest client chunks per page and what is in them. Build in a throwaway `git -C <REPO> worktree add --detach <SCRATCH>/audit/performance/wt <SHA>` with `npm ci` (never symlink node_modules), and end with `git -C <REPO> worktree remove --force <SCRATCH>/audit/performance/wt`. Or analyze production chunk URLs directly.
 5. Third-party scripts (ads, analytics, widgets): what loads on every page, what it costs in main-thread time, and whether it does anything on that page (for example an ad script on pages with no ad slot).
@@ -96,7 +96,7 @@ Known open items to re-verify, not repeat: <KNOWN_ITEMS>.
    - INSERT: never probe live. Decide from the policies and grants in <SCHEMA_PATHS> and the migrations.
    Confirm write exposure against the row-level security policies before grading any write finding above medium.
 2. Input integrity: can a client post an impossible value or spam a public list; current public rows that look fake (read-only GET); server-side checks to add.
-3. Errors: runtime errors and logs from <LOG_SOURCE, e.g. the host MCP get_runtime_errors / get_runtime_logs, or the CLI>. Recurring 4xx and 5xx and exceptions over the last few days, and how long logs are kept on this plan.
+3. Errors: runtime errors and logs from <LOG_SOURCE, e.g. the host MCP get_runtime_errors / get_runtime_logs, or the CLI>. Recurring 4xx and 5xx and exceptions over the last few days, the time span the logs actually covered, and how long logs are kept on this plan.
 4. Security headers on key pages via `curl -sI` (CSP, HSTS, X-Frame-Options or frame-ancestors, Referrer-Policy, Permissions-Policy, X-Content-Type-Options), compared with what the framework config sets.
 5. Client data: where user history lives (localStorage, IndexedDB), whether storage is persisted, whether export or backup exists, and what eviction or a cleared browser loses.
 6. Dependencies: `npm audit --omit=dev` summary and outdated majors that matter (read-only).
